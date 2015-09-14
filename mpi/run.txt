@@ -1,0 +1,4 @@
+sudo apt-get install libcr-dev mpich2 mpich2-doc
+
+mpic++ ej3.cpp -o ej3
+mpirun -np 5 ./ej3 
