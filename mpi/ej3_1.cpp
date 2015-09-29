@@ -7,7 +7,7 @@
 #include <algorithm>
 #include <sstream>
 
-#define TEXT_SIZE 100
+#define TEXT_SIZE 3000000
 
 using namespace std;
 
@@ -30,7 +30,6 @@ int main(int argc, char *argv[])
 
 	int MPI_Rank , MPI_Size ; 
 
-
 	MPI_Init(&argc, &argv);
 	MPI_Comm_rank(MPI_COMM_WORLD , &MPI_Rank );
 	MPI_Comm_size(MPI_COMM_WORLD , &MPI_Size );
@@ -46,7 +45,7 @@ int main(int argc, char *argv[])
 	char buffer[TEXT_SIZE];
 	int repeated;
 
-	const char word[] = "archivo";
+	const char word[] = "delicate";
 
 
 	//char query[7] = {''}; 
@@ -59,7 +58,7 @@ int main(int argc, char *argv[])
 
 	if(MPI_Rank == 0){
 		ifstream in_file;
-		in_file.open("text.txt");
+		in_file.open("big.txt");
 		in_file.read(buffer,nsize);
 		in_file.close();
 		buffer[TEXT_SIZE-1] = ' ';
@@ -122,6 +121,9 @@ int main(int argc, char *argv[])
 
 
 	}
+
+	MPI_Finalize();
+
 
 	return 0;
 }
