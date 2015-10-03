@@ -73,39 +73,42 @@ int main(int argc, char *argv[])
 	MPI_Comm_rank(MPI_COMM_WORLD , &MPI_Rank );
 	MPI_Comm_size(MPI_COMM_WORLD , &MPI_Size );
 	
-	int vec[16] = {15,11,9,16,3,14,8,7,4,6,12,10,5,2,13,1};
+	MPI_Status status;
 
-	// if(MPI_Rank == 0){
-
-
-	// 	// set_vector(vec , 16);
-	// 	show_vector(vec , 16);
-
-	// 	Odd_even_sort(vec, 16);
-	// 	show_vector(vec , 16);
-	// }
+	int vec[16] = {15,11,9,16, 3,14,8,7, 4,6,12,10, 5,2,13,1};
 
 	int local_size = 16/MPI_Size;
 
-	int local_vec[16/MPI_Size];
+	int local_vec[local_size*2] = {0};
+	int aux_vec[local_size];
+	int vec_to_sort[local_size*2];
 
 	MPI_Scatter(&vec , 16/MPI_Size, MPI_INT, &local_vec, 16/MPI_Size, MPI_INT,  0, MPI_COMM_WORLD);
 
-	show_vector(local_vec , local_size);
 	Odd_even_sort(local_vec, local_size);
-	show_vector(local_vec , local_size);
 
-	for(int phase ; phase < MPI_Size; ++phase){
+	for(int phase=0 ; phase < local_size; ++phase){
 		int partner = compute_partner(MPI_Rank, phase);
 		if(partner != -1){
-			printf("rank , partner,  phase %d,%d,%d\n", MPI_Rank, partner , phase);
-		MPI_Send()
-		MPI_Recv()
+			// printf("rank , partner,  phase %d,%d,%d\n", MPI_Rank, partner , phase);
+		
+			if(partner < MPI_Rank){
+				MPI_Send(&local_vec , local_size, MPI_INT, partner, TAG, MPI_COMM_WORLD);
+				MPI_Recv(&local_vec, local_size, MPI_INT, partner, TAG, MPI_COMM_WORLD, &status);
+			}
+			else{
+				MPI_Recv(&local_vec[local_size], local_size, MPI_INT, partner, TAG, MPI_COMM_WORLD, &status);
+				Odd_even_sort(local_vec , local_size*2);
+				MPI_Send(&local_vec[local_size], local_size, MPI_INT, partner, TAG, MPI_COMM_WORLD);
+			}
 		}
 
-	}
+		MPI_Gather(&local_vec, local_size, MPI_INT, vec, local_size, MPI_INT, 0, MPI_COMM_WORLD);
+		if(MPI_Rank == 0)	show_vector(vec , 16);
 
-	
+	}
+	// MPI_Gather(&local_vec, local_size, MPI_INT, vec, local_size, MPI_INT, 0, MPI_COMM_WORLD);
+	// if(MPI_Rank == 0)	show_vector(vec , 16);
 
 	MPI_Finalize();
 
