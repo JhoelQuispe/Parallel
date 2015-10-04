@@ -1,0 +1,2 @@
+g++ -g -Wall matrix_mult.cpp -o matrix_mult.exe -lpthread
+./matrix_mult.exe 4
